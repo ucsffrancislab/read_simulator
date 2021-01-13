@@ -35,7 +35,34 @@ generate.bash single --read_count 10000 --min_read_length 500 --max_read_length 
 ```
 
 
+or like ...
+
+
+```BASH
+create_fragment_bed.bash --length 1000 --outbase illumina
+
+bedtools getfasta hg38-mhc.fa illumina.bed illumina.exact.fasta
+
+add_error_to_fragments.bash --percent 1 ... illumina.exact.fasta
+
+fragments_to_paired_end.bash ... illumina.exact.fasta
+
+
+
+
+create_fragment_bed.bash --min_length 500 --max_length 15000 --outbase nanopore
+
+bedtools getfasta hg38-mhc.fa nanopore.bed nanopore.exact.fasta
+
+add_error_to_fragments.bash --percent 20 nanopore.exact.fasta
 ```
+
+
+
+
+
+
+```BASH
 illumina_R1.fasta
 illumina_R2.fasta
 
@@ -44,7 +71,7 @@ nanopore.fasta
 
 
 
-```
+```BASH
 canu -p nano -d nano genomeSize=5m useGrid=false -nanopore nanopore.fasta
 ```
 
@@ -53,7 +80,7 @@ canu -p nano -d nano genomeSize=5m useGrid=false -nanopore nanopore.fasta
 
 Create a config.txt file
 
-```
+```BASH
 masurca_install_path/bin/masurca config.txt
 assemble.sh
 ```
