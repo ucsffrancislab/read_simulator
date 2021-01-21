@@ -56,6 +56,35 @@ canu on the "10x5-50" is perfect. 1 contig 4970458 bp. Perfect!
 ##	Add error and test shorter segments for consensus
 
 
+https://www.onelambda.com/en/product/alltype-ngs-reagents.html
+
+Its the alltype 11 kit
+
+
+11 complete HLA sites? Where? How long? How to consensus each site for each subject? Does canu or the other assemblers provide a consensus?
+A (Full gene)
+B (Full gene)
+C (Full gene)	
+DRB1 (Exon 2 - 3' UTR)
+DRB345 (Exon 2 - 3' UTR) - not in chr6 hg38.ncbiRefSeq.gtf (in alternates) ( not sure why group names. This is DRB3, DRB4 and DRB5. )
+DQB1 (Exon 2 - 3' UTR)
+DQA1 (Full gene)
+DPB1 (Exon 2 - 3’UTR)
+DPA1 (Full gene)
+
+
+
+
+hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf
+
+awk -F"\t" '( ( $1 == "chr6" ) && ( $3 == "transcript" ) )' ./sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf | grep "HLA-" > ./sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.HLA.gtf
+
+Manually select longest transcript versions of A, B, C, DRB1, DRB5, DQA1, DQB1, DPA1, DPB1
+
+DRB3 and DRB4 are only in alternate sequences.
+
+bedtools getfasta -fi /francislab/data1/refs/fasta/hg38.fa -bed /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.selectHLA.gtf -fo /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa -name+
+
 
 
 
