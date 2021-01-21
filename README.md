@@ -38,22 +38,22 @@ bedtools getfasta -name -fi hg38-mhc.fa -bed nanopore.bed.gz -fo nanopore.exact.
 add_error_to_fragments.bash --percent 10 nanopore.exact.fasta
 ```
 
-	-name		Use the name field and coordinates for the FASTA header
-	-name+		(deprecated) Use the name field and coordinates for the FASTA header
-	-nameOnly	Use the name field for the FASTA header
-	-split		Given BED12 fmt., extract and concatenate the sequences
-			from the BED "blocks" (e.g., exons)
-	-tab		Write output in TAB delimited format.
-			- Default is FASTA format.
-	-s		Force strandedness. If the feature occupies the antisense,
-			strand, the sequence will be reverse complemented.
-			- By default, strand information is ignored.
 
+##	Test with Canu
+
+Generate a variety of test data sets for comparison
 
 ```BASH
-canu -p nano -d nano genomeSize=5m useGrid=false -nanopore nanopore.fasta
+create_test_data.bash
+
+assemble_test_data.bash
 ```
 
+canu on the "10x5-50" is perfect. 1 contig 4970458 bp. Perfect!
+
+
+
+##	Add error and test shorter segments for consensus
 
 
 
@@ -63,19 +63,11 @@ canu -p nano -d nano genomeSize=5m useGrid=false -nanopore nanopore.fasta
 
 
 
-```BASH
-create_fragment_bed.bash --reference hg38-mhc.fa --min_length 400 --max_length 500 --count 50000 --output illumina.bed.gz
-
-bedtools getfasta -fi hg38-mhc.fa -bed illumina.bed.gz -fo illumina.exact.fasta
-
-add_error_to_fragments.bash --percent 1 ... illumina.exact.fasta
-
-fragments_to_paired_end.bash ... illumina.exact.fasta
-```
 
 
+##	Masurca
 
-
+If matched with Illumina short read data could use Masurca.
 
 Create a config.txt file
 
@@ -83,6 +75,4 @@ Create a config.txt file
 masurca_install_path/bin/masurca config.txt
 assemble.sh
 ```
-
-
 

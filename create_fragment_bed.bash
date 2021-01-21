@@ -75,20 +75,6 @@ else
 
 		for i in $( seq -w ${chr_count} ) ; do
 
-			#	The first three required BED fields are:
-			#	
-			#	chrom - The name of the chromosome (e.g. chr3, chrY, chr2_random) or scaffold (e.g. scaffold10671).
-			#	chromStart - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.
-			#	chromEnd - The ending position of the feature in the chromosome or scaffold. The chromEnd base is not included in the display of the feature, however, the number in position format will be represented. For example, the first 100 bases of chromosome 1 are defined as chrom=1, chromStart=0, chromEnd=100, and span the bases numbered 0-99 in our software (not 0-100), but will represent the position notation chr1:1-100. Read more here.
-			#	The 9 additional optional BED fields are:
-			#	
-			#	name - Defines the name of the BED line. This label is displayed to the left of the BED line in the Genome Browser window when the track is open to full display mode or directly to the left of the item in pack mode.
-		
-
-			#	randomly select length
-			#	randomly select central position
-			#	trim excess over beginning or end
-
 			position=$( shuf -i 0-${reflength} -n 1 )
 			length=$( shuf -i ${min_length}-${max_length} -n 1 )
 			cstart=$(( ${position} - ( ${length}/2 ) - 1 ))
