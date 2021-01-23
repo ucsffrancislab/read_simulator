@@ -62,30 +62,70 @@ Its the alltype 11 kit
 
 
 11 complete HLA sites? Where? How long? How to consensus each site for each subject? Does canu or the other assemblers provide a consensus?
-A (Full gene)
-B (Full gene)
+* A (Full gene)
+* B (Full gene)
 C (Full gene)	
-DRB1 (Exon 2 - 3' UTR)
-DRB345 (Exon 2 - 3' UTR) - not in chr6 hg38.ncbiRefSeq.gtf (in alternates) ( not sure why group names. This is DRB3, DRB4 and DRB5. )
-DQB1 (Exon 2 - 3' UTR)
-DQA1 (Full gene)
-DPB1 (Exon 2 - 3’UTR)
-DPA1 (Full gene)
+* DRB1 (Exon 2 - 3' UTR)
+* DRB345 (Exon 2 - 3' UTR) - not in chr6 hg38.ncbiRefSeq.gtf (in alternates) ( not sure why group names. This is DRB3, DRB4 and DRB5. )
+* DQB1 (Exon 2 - 3' UTR)
+* DQA1 (Full gene)
+* DPB1 (Exon 2 - 3’UTR)
+* DPA1 (Full gene)
 
 
 
+```BASH
+/francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf
 
-hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf
-
-awk -F"\t" '( ( $1 == "chr6" ) && ( $3 == "transcript" ) )' ./sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf | grep "HLA-" > ./sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.HLA.gtf
+awk -F"\t" '( ( $1 == "chr6" ) && ( $3 == "transcript" ) )' /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.gtf | grep "HLA-" > /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.HLA.gtf
+```
 
 Manually select longest transcript versions of A, B, C, DRB1, DRB5, DQA1, DQB1, DPA1, DPB1
+And change "transcript" to the HLA name so the extracted sequence names are "HLA-A", "HLA-DPB1", etc.
 
-DRB3 and DRB4 are only in alternate sequences.
-
-bedtools getfasta -fi /francislab/data1/refs/fasta/hg38.fa -bed /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.selectHLA.gtf -fo /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa -name+
+DRB3 and DRB4 are only in alternate sequences so ignoring for the moment.
 
 
+```BASH
+cp /francislab/data1/refs/sources/hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/genes/hg38.ncbiRefSeq.chr6.transcript.HLA.gtf ./
+
+bedtools getfasta -fi /francislab/data1/refs/fasta/hg38.fa -bed hg38.ncbiRefSeq.chr6.transcript.selectHLA.gtf -fo hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa -name
+
+samtools faidx hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa
+
+\rm hla.fa
+
+for x in $( cat hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa.fai | awk '{print $1}' ) ; do
+samtools faidx hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa ${x} >> hla.fa
+samtools faidx --reverse-complement hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa ${x} >> hla.fa
+done
+samtools faidx hla.fa
+```
+
+
+Ok. Now select regions or keep whole. Then add some error.
+
+```
+create_fragment_bed.bash --reference hla.fa --min_length 5000 --max_length 15000 --count 5000 --output nanopore.bed.gz
+
+bedtools getfasta -name -fi hla.fa -bed nanopore.bed.gz -fo nanopore.exact.fasta
+
+add_error_to_fragments.bash --percent 10 nanopore.exact.fasta > nanopore.error10a.fasta
+add_error_to_fragments.bash --percent 10 nanopore.exact.fasta > nanopore.error10b.fasta
+add_error_to_fragments.bash --percent 10 nanopore.exact.fasta > nanopore.error10c.fasta
+
+
+for f in ${PWD}/nanopore.error10?.fasta ; do
+echo "Assembling ${f}"
+base=${f%.fasta}
+echo $base
+outdir=${base}-canu
+mkdir $outdir
+sbatch --job-name=$(basename $base)  --time=480 --ntasks=8 --mem=8G --output=${outdir}/stdout \
+${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G \
+-p canu -d ${outdir} -nanopore ${f}
+done
+```
 
 
 

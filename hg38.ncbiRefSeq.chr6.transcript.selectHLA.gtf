@@ -1,0 +1,9 @@
+chr6	ncbiRefSeq	HLA-A	29942532	29945870	.	+	.	gene_id "HLA-A"; transcript_id "NM_002116.8";  gene_name "HLA-A";
+chr6	ncbiRefSeq	HLA-C	31268749	31272092	.	-	.	gene_id "HLA-C"; transcript_id "NM_002117.6";  gene_name "HLA-C";
+chr6	ncbiRefSeq	HLA-B	31353875	31357179	.	-	.	gene_id "HLA-B"; transcript_id "NM_005514.8";  gene_name "HLA-B";
+chr6	ncbiRefSeq	HLA-DRB1	32578769	32589836	.	-	.	gene_id "HLA-DRB1"; transcript_id "NM_002124.3";  gene_name "HLA-DRB1";
+chr6	ncbiRefSeq	HLA-DQA1	32637406	32654846	.	+	.	gene_id "HLA-DQA1"; transcript_id "XM_006715079.4";  gene_name "HLA-DQA1";
+chr6	ncbiRefSeq	HLA-DQB1	32659467	32666657	.	-	.	gene_id "HLA-DQB1"; transcript_id "NM_002123.5";  gene_name "HLA-DQB1";
+chr6	ncbiRefSeq	HLA-DPA1	33064569	33080748	.	-	.	gene_id "HLA-DPA1"; transcript_id "NM_001242525.2";  gene_name "HLA-DPA1";
+chr6	ncbiRefSeq	HLA-DPB1	33075990	33089696	.	+	.	gene_id "HLA-DPB1"; transcript_id "NM_002121.6";  gene_name "HLA-DPB1";
+chr6	ncbiRefSeq	HLA-DRB5	32517343	32530316	.	-	.	gene_id "HLA-DRB5"; transcript_id "XM_011514562.2";  gene_name "HLA-DRB5";

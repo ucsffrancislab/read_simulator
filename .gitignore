@@ -1,1 +1,9 @@
 test/
+nanopore.bed.gz
+nanopore.error10a-canu/
+nanopore.error10a.fasta
+nanopore.error10b-canu/
+nanopore.error10b.fasta
+nanopore.error10c-canu/
+nanopore.error10c.fasta
+nanopore.exact.fasta
