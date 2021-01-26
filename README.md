@@ -106,7 +106,7 @@ samtools faidx hla.fa
 Ok. Now select regions or keep whole. Then add some error.
 
 ```
-create_fragment_bed.bash --reference hla.fa --min_length 5000 --max_length 15000 --count 5000 --output nanopore.bed.gz
+create_fragment_bed.bash --reference hla.fa --min_length 5000 --max_length 15000 --count 20000 --output nanopore.bed.gz
 
 bedtools getfasta -name -fi hla.fa -bed nanopore.bed.gz -fo nanopore.exact.fasta
 
@@ -123,7 +123,7 @@ outdir=${base}-canu
 mkdir $outdir
 sbatch --job-name=$(basename $base)  --time=480 --ntasks=8 --mem=8G --output=${outdir}/stdout \
 ${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G \
--p canu -d ${outdir} -nanopore ${f}
+-p canu -d ${outdir} -trimmed -nanopore ${f}
 done
 ```
 
