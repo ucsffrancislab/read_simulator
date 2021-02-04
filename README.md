@@ -99,8 +99,30 @@ for x in $( cat hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa.fai | awk '{print $
 samtools faidx hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa ${x} >> hla.fa
 samtools faidx --reverse-complement hg38.ncbiRefSeq.chr6.transcript.selectHLA.fa ${x} >> hla.fa
 done
+sed -i '/^>.*[^\/rc]$/ s/$/\/fw/' hla.fa 
+sed -i '/^>/ s/\//_/' hla.fa 
 samtools faidx hla.fa
+
+mkdir hla
+cat hla.fa | awk '(/^>/){s=$0;gsub(/^>/,"",s);}{print >> "hla/"s".fasta"}'
+
+
+./create_test_data.bash
+
+./assemble_test_data.bash
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Ok. Now select regions or keep whole. Then add some error.
@@ -122,16 +144,64 @@ echo $base
 outdir=${base}-canu
 mkdir $outdir
 sbatch --job-name=$(basename $base)  --time=480 --ntasks=8 --mem=8G --output=${outdir}/stdout \
-${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G \
+${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G maxInputCoverage=1000 \
 -p canu -d ${outdir} -trimmed -nanopore ${f}
 done
+
+mkdir ${PWD}/canu-exact
+sbatch --job-name=canuexact  --time=480 --ntasks=8 --mem=8G --output=${PWD}/canu-exact/stdout \
+${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G maxInputCoverage=1000 \
+-p canu -d ${PWD}/canu-exact -corrected -trimmed -nanopore ${PWD}/nanopore.exact.fasta
+
+mkdir ${PWD}/canu
+sbatch --job-name=canu  --time=480 --ntasks=8 --mem=8G --output=${PWD}/canu/stdout \
+${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G \
+-p canu -d ${PWD}/canu -corrected -trimmed -nanopore ${PWD}/nanopore.error10?.fasta
+
+
+
+cat nanopore.exact.fasta | awk '(/^>/){ if($0 ~ /.*\/rcseq.*/){f="nanopore.exact.reverseonly.fasta"}else{f="nanopore.exact.forwardonly.fasta"}}{print > f}'
+
+mkdir ${PWD}/canu-exact-forwardonly
+sbatch --job-name=canuexactfwd  --time=480 --ntasks=8 --mem=8G --output=${PWD}/canu-exact-forwardonly/stdout \
+${PWD}/canu.bash genomeSize=90k useGrid=false maxThreads=8 maxMemory=8G maxInputCoverage=1000 \
+-p canu -d ${PWD}/canu-exact-forwardonly -corrected -trimmed -nanopore ${PWD}/nanopore.exact.forwardonly.fasta
+```
+
+
+##	Shasta
+
+```
+sbatch --job-name=shastaexactfwd  --time=480 --ntasks=8 --mem=30G --output=${PWD}/shasta-exact-forwardonly.stdout \
+${PWD}/shasta.bash --Reads.minReadLength 1000 --config ${PWD}/Nanopore-Sep2020.conf \
+--input ${PWD}/nanopore.exact.forwardonly.fasta --assemblyDirectory ${PWD}/shasta-exact-forwardonly
+
+
+
+sbatch --job-name=shastaexact  --time=480 --ntasks=8 --mem=30G --output=${PWD}/shasta-exact.stdout \
+${PWD}/shasta.bash --MinHash.maxBucketSize 1000 --Reads.minReadLength 1000 \
+--config ${PWD}/Nanopore-Sep2020.conf \
+--input ${PWD}/nanopore.exact.fasta --assemblyDirectory ${PWD}/shasta-exact
 ```
 
 
 
+Selected thresholds automatically for the following parameters:
+	alignedFraction:	1.005
+	markerCount:		205
+	maxDrift:		0.5
+	maxSkip:		1.5
+	maxTrim:		0.5
+Keeping 0 alignments of 845647
+2021-Feb-02 14:56:25.242747 Begin flagCrossStrandReadGraphEdges.
 
 
+##	Flye
 
+```
+sbatch --job-name=flyeexactfwd  --time=480 --ntasks=8 --mem=30G --output=${PWD}/flye-exact-forwardonly.stdout \
+${PWD}/flye.bash --genome-size 90k --threads 8 --subassemblies ${PWD}/nanopore.exact.forwardonly.fasta --out-dir ${PWD}/flye-exact-forwardonly
+```
 
 
 ##	Masurca
